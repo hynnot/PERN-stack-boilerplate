@@ -1,0 +1,17 @@
+FROM node:lts
+LABEL Tony Morellá Llácer <hynnot@gmail.com>
+LABEL repo=https://github.com/hynnot/PERN-stack-boilerplate
+
+WORKDIR /usr/src
+COPY ./types ./types
+COPY ./backend/.env ./
+
+WORKDIR app
+COPY ./backend/package.json ./backend/tsconfig.json ./
+COPY ./backend/src ./src
+RUN npm install
+RUN npm run build
+COPY ./backend/.env ./
+
+WORKDIR /usr/src
+CMD ["node", "app/dist/app/src/app.js"]

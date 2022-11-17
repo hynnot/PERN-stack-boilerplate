@@ -1,0 +1,49 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      CLIENT_URL: http://localhost:3000 # Set to server address given by Linode
+      DATABASE_URL: postgres://user:password@db/db
+      NODE_ENV: production
+      PORT: 5000
+    volumes:
+      - ./backend:/usr/app
+      - /usr/app/node_modules
+      - ./types:/usr/types
+
+  db:
+    image: postgres
+    container_name: db
+    restart: always
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - server-side
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/app
+      - ./types/index.ts:/usr/types/index.ts
+
+volumes:
+    db-data:
+    pgadmin-data:

@@ -1,0 +1,42 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile_dev
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      CLIENT_URL: http://localhost:3000
+      DATABASE_URL: postgres://user:password@db/db
+      # GITHUB_CALLBACK_URL: /auth/github/callback
+      NODE_ENV: development
+      PORT: 5000
+    volumes:
+      - ./backend:/usr/app
+      - /usr/app/node_modules
+      - ./types:/usr/types
+
+  db:
+    image: postgres
+    container_name: db
+    restart: always
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    networks:
+      - server-side
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+networks:
+  # client-side: {}
+  server-side: {}
+
+volumes:
+  db-data: {}
